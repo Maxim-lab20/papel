@@ -1,6 +1,7 @@
 package com.example.papel.service.impl;
 
 import com.example.papel.entity.UserEntity;
+import com.example.papel.exception.UserNotFoundException;
 import com.example.papel.mapper.UserMapper;
 import com.example.papel.repository.UserRepository;
 import com.example.papel.service.UserService;
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto) {
         UserEntity existingUserEntity = userRepository.findById(userDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userDto.getUserId()));
+                .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userDto.getUserId()));
 
         existingUserEntity.setUsername(userDto.getUsername());
         existingUserEntity.setEmail(userDto.getEmail());
