@@ -30,4 +30,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "userEntity", fetch = FetchType.LAZY)
     private List<PostEntity> postEntities;
+
+    @Version
+    private int version;
 }
