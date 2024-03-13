@@ -10,9 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.stream.IntStream;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,24 +19,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        return IntStream.range(0, 3)
-                .mapToObj(i -> executeWithRetry(userDto))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElseThrow(() -> {
-                    log.error("Failed to create post user to optimistic locking conflict after 3 retries. Please try again later.");
-                    return new OptimisticLockingFailureException("Failed to create user due to optimistic locking conflict.");
-                });
-    }
-
-    private UserDto executeWithRetry(UserDto userDto) {
         try {
             UserEntity persistedUserEntity = userRepository.save(UserMapper.INSTANCE.toUserEntity(userDto));
             return UserMapper.INSTANCE.toUserDto(persistedUserEntity);
-        } catch (OptimisticLockingFailureException ex) {
-            log.warn("Optimistic locking failure occurred while creating user. Retrying operation...");
-            return null;
+        } catch (OptimisticLockingFailureException e) {
+            log.error("Failed to create user due to optimistic locking conflict.");
+            throw e;
         }
     }
 
+    @Override
+    public UserDto updateUser(UserDto userDto) {
+        UserEntity existingUserEntity = userRepository.findById(userDto.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userDto.getUserId()));
+
+        existingUserEntity.setUsername(userDto.getUsername());
+        existingUserEntity.setEmail(userDto.getEmail());
+
+        try {
+            UserEntity updatedUserEntity = userRepository.save(existingUserEntity);
+            return UserMapper.INSTANCE.toUserDto(updatedUserEntity);
+        } catch (OptimisticLockingFailureException e) {
+            log.error("Failed to update user due to optimistic locking conflict.");
+            throw e;
+        }
+    }
 }

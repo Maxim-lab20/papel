@@ -19,6 +19,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserDto'
+    put:
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
   /posts:
     post:
       operationId: createPost
@@ -42,6 +57,7 @@ components:
       properties:
         userId:
           type: integer
+          format: int64
         username:
           type: string
         email:

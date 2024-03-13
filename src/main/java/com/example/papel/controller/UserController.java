@@ -20,4 +20,9 @@ public class UserController implements UsersApi {
                 .status(HttpStatus.CREATED)
                 .body(userService.createUser(userDto));
     }
+
+    @Override
+    public ResponseEntity<UserDto> updateUser(UserDto userDto) {
+        return ResponseEntity.ok(userService.updateUser(userDto));
+    }
 }
