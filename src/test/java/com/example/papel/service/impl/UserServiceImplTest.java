@@ -1,6 +1,7 @@
 package com.example.papel.service.impl;
 
 import com.example.papel.entity.UserEntity;
+import com.example.papel.exception.UserNotFoundException;
 import com.example.papel.mapper.UserMapper;
 import com.example.papel.repository.UserRepository;
 import com.papel.openapi.dto.UserDto;
@@ -100,7 +101,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.empty());
 
         // WHEN / THEN
-        assertThrows(IllegalArgumentException.class, () -> userService.updateUser(userDto));
+        assertThrows(UserNotFoundException.class, () -> userService.updateUser(userDto));
     }
 
     @Test
